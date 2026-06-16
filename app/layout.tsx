@@ -1,19 +1,25 @@
 import type { Metadata } from "next";
-import { Oxanium, Merriweather, Fira_Code } from "next/font/google";
+import { Poppins, Alkalami, Roboto_Mono } from "next/font/google";
 import "./globals.css";
+import { ReactNode } from "react";
+import Background from "@/components/background";
+import { ThemeProvider } from "@/components/theme-provider";
 
-const fontSans = Oxanium({
+const fontSans = Poppins({
   subsets: ["latin"],
+  weight: "400",
   variable: "--font-sans",
 });
 
-const fontSerif = Merriweather({
+const fontSerif = Alkalami({
   subsets: ["latin"],
+  weight: "400",
   variable: "--font-serif",
 });
 
-const fontMono = Fira_Code({
+const fontMono = Roboto_Mono({
   subsets: ["latin"],
+  weight: "400",
   variable: "--font-mono",
 });
 
@@ -25,15 +31,22 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        suppressHydrationWarning
-        className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased`}
+        className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased relative`}
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Background />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
