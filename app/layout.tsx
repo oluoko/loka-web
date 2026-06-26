@@ -36,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased relative`}
+        className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased relative overflow-x-hidden`}
       >
         <ThemeProvider
           attribute="class"

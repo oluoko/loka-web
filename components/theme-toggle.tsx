@@ -13,8 +13,6 @@ export function ThemeToggle({ className }: ModeToggleProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // Only render theme-dependent UI after hydration
-  // Before this, server and client agree: render nothing sensitive
   useEffect(() => {
     setMounted(true);
   }, []);
