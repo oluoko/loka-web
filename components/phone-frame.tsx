@@ -6,25 +6,15 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import gsap from "gsap";
 
 const REST = {
-  rotation: { x: -0.6, y: 1.6, z: -0.24 },
+  rotation: { x: -0, y: 1.15, z: -0.11 },
   position: { x: 0, y: -0.5, z: 0 },
-  scale: 0.13,
+  scale: 0.15,
 };
-
-const SNAP_DELAY_MS = 6700;
 
 export function PhoneFrame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef<number>(0);
   const phoneRef = useRef<THREE.Group | null>(null);
-  const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const dragStartRef = useRef({
-    x: 0,
-    y: 0,
-    rotX: REST.rotation.x,
-    rotY: REST.rotation.y,
-    rotZ: REST.rotation.z,
-  });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -61,26 +51,6 @@ export function PhoneFrame() {
       phoneRef.current = phone;
     });
 
-    const scheduleSnap = () => {
-      if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
-      snapTimerRef.current = setTimeout(() => {
-        const phone = phoneRef.current;
-        if (!phone) return;
-        gsap.to(phone.rotation, {
-          x: REST.rotation.x,
-          y: REST.rotation.y,
-          z: REST.rotation.z,
-          duration: 1.4,
-          ease: "elastic.out(1, 0.6)",
-          onComplete: () => {
-            dragStartRef.current.rotX = REST.rotation.x;
-            dragStartRef.current.rotY = REST.rotation.y;
-            dragStartRef.current.rotZ = REST.rotation.z;
-          },
-        });
-      }, SNAP_DELAY_MS);
-    };
-
     const onScroll = () => {
       const phone = phoneRef.current;
       if (!phone) return;
@@ -97,49 +67,12 @@ export function PhoneFrame() {
       });
     };
 
-    let dragActive = false;
-
-    const onPointerDown = (e: PointerEvent) => {
-      dragActive = true;
-      dragStartRef.current = {
-        x: e.clientX,
-        y: e.clientY,
-        rotX: phoneRef.current?.rotation.x ?? REST.rotation.x,
-        rotY: phoneRef.current?.rotation.y ?? REST.rotation.y,
-        rotZ: phoneRef.current?.rotation.z ?? REST.rotation.z,
-      };
-      canvas.setPointerCapture(e.pointerId);
-      canvas.style.cursor = "grabbing";
-      if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
-    };
-
-    const onPointerMove = (e: PointerEvent) => {
-      if (!dragActive || !phoneRef.current) return;
-      const { x, y, rotX, rotY, rotZ } = dragStartRef.current;
-      const dx = e.clientX - x;
-      const dy = e.clientY - y;
-      phoneRef.current.rotation.y = rotY + dx * 0.008;
-      phoneRef.current.rotation.x = rotX + dy * 0.008;
-      phoneRef.current.rotation.z = rotZ - dx * 0.003;
-    };
-
-    const onPointerUp = () => {
-      if (!dragActive) return;
-      dragActive = false;
-      canvas.style.cursor = "grab";
-      scheduleSnap();
-    };
-
     const handleResize = () => {
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     };
 
-    canvas.style.cursor = "grab";
-    canvas.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("pointermove", onPointerMove);
-    window.addEventListener("pointerup", onPointerUp);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", handleResize);
 
@@ -151,15 +84,11 @@ export function PhoneFrame() {
 
     return () => {
       cancelAnimationFrame(frameRef.current);
-      if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
-      canvas.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", handleResize);
       renderer.dispose();
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="w-full h-full block cursor-grab" />;
+  return <canvas ref={canvasRef} className="w-full h-full block" />;
 }
