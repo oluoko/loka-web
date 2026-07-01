@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins, Alkalami, Roboto_Mono } from "next/font/google";
+// @ts-ignore: CSS module import for Next.js global styles
 import "./globals.css";
 import { ReactNode } from "react";
 import Background from "@/components/background";
